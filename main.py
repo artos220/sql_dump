@@ -24,7 +24,7 @@ for db in databases:
     db = db.values()[0]
 
     if db in sys_databases:
-    #if db not in 'sh':
+    #if db not in 'Forecasts':
         continue
 
     print(db)
@@ -56,6 +56,12 @@ for db in databases:
                           'object_parameters',
                           'event_message_context',
                           'executable_statistics',
+                          'Report_1_Regions_Polygons',
+                          'Report_1_Users',
+                          'Report_1_WH_Coordinates',
+                          'Report_1_WH_Coordinates_part2',
+                          '_index_defrag',
+                          '_index_defrag_stage',
                           ):
         #if table.name not in 'Bat_CfgRole':
             continue
@@ -71,6 +77,7 @@ for db in databases:
 
         with open(f'{DIR}/{script_name}.sql', "a+", encoding="utf-8") as f:
             f.truncate(0)  # clear file
+            f.write(f'USE {db};\n')
             f.write(f'SET IDENTITY_INSERT {table} ON;\n')
 
             for val in values:
@@ -81,5 +88,6 @@ for db in databases:
                 f.write(str(literalquery(insert_query)))
 
                 f.write(';\n')
+                f.write(f'SET IDENTITY_INSERT {table} OFF;\n')
 
     connection.close()
