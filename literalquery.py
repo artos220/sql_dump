@@ -1,5 +1,6 @@
 from datetime import datetime
-from sqlalchemy.dialects.mssql import MONEY, DATE, BINARY, VARBINARY, DATETIME, DATETIME2, TIME, UNIQUEIDENTIFIER, IMAGE
+from sqlalchemy.dialects.mssql import MONEY, DATE, BINARY, VARBINARY, DATETIME, DATETIME2, TIME, UNIQUEIDENTIFIER,\
+    IMAGE, TIMESTAMP, SQL_VARIANT
 from sqlalchemy.engine.default import DefaultDialect
 from sqlalchemy.sql.sqltypes import String, DateTime, NullType, DECIMAL
 import sqlalchemy.orm
@@ -53,6 +54,8 @@ class LiteralDialect(DefaultDialect):
         UNIQUEIDENTIFIER: StringLiteral,
         VARBINARY: StringLiteral,
         IMAGE: StringLiteral,
+        TIMESTAMP: StringLiteral,
+        SQL_VARIANT: StringLiteral,
     }
 
 

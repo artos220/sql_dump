@@ -8,10 +8,10 @@ from literalquery import literalquery
 
 
 N = 10  # limit rows
-SERVER = 'localhost'
+SERVER = 'biload'
 DATABASE = 'dwh'
 
-sys_databases = ['master', 'tempdb', 'model', 'msdb']
+sys_databases = ['master', 'tempdb', 'model', 'msdb', 'SCB', 'SCB_2', 'querymon']
 sys_schemas = ['db_accessadmin', 'db_backupoperator', 'db_datareader', 'db_datawriter', 'db_ddladmin',
                'db_denydatareader', 'db_denydatawriter', 'db_owner', 'db_securityadmin', 'guest',
                'INFORMATION_SCHEMA', 'sys']
@@ -22,8 +22,11 @@ databases = engine.execute('SELECT name FROM sys.databases;').fetchall()
 
 for db in databases:
     db = db.values()[0]
+
     if db in sys_databases:
+    #if db not in 'sh':
         continue
+
     print(db)
 
     DIR = f'data/{db}'
@@ -40,10 +43,20 @@ for db in databases:
 
     for schema in sch_list:
         if schema not in sys_schemas:
-            meta.reflect(bind=engine, schema=schema)
+            adapt_schema = str(schema)
+            if adapt_schema.find("\\") > 0\
+                    or adapt_schema.find(".") > 0:
+                adapt_schema = f'[{adapt_schema}]'
+            meta.reflect(bind=engine, schema=adapt_schema)
 
     for table in meta.sorted_tables:
-        if table.name in ('sysdiagrams', 'dimCatalogCities'):
+        if table.name in ('sysdiagrams',
+                          'dimCatalogCities',
+                          'execution_parameter_values',
+                          'object_parameters',
+                          'event_message_context',
+                          'executable_statistics',
+                          ):
         #if table.name not in 'Bat_CfgRole':
             continue
         print(table)
@@ -54,7 +67,9 @@ for db in databases:
         keys = list(result.keys())
         values = list(result)
 
-        with open(f'{DIR}/{table}.sql', "a+", encoding="utf-8") as f:
+        script_name = str(table).replace("\\", "")
+
+        with open(f'{DIR}/{script_name}.sql', "a+", encoding="utf-8") as f:
             f.truncate(0)  # clear file
             f.write(f'SET IDENTITY_INSERT {table} ON;\n')
 
